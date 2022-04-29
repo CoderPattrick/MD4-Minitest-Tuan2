@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>Welcum tu BookSto</h1>
+<form>
+  <h3>Create new Book</h3>
+    <table>
+  <tr><td>Name</td>
+  <td><input type="text" id="name" name="name"/></td></tr>
+  <tr><td>Author</td>
+  <td><input type="text" id="author" name="author"/></td></tr>
+  <tr><td>Description</td>
+  <td><input type="text" id="description" name="description"/></td></tr>
+    <tr><td>Category</td>
+    <td><select name="category" id="category">
+        <th:block>
+            <option th:each="cate: ${categories}" th:text="${cate.name}" th:value="${cate.id}">
+            </option>
+        </th:block>
+    </select></td></tr>
+    </table>
+    <input type="submit" value="Create" onclick="createBook(this)">
+</form>
+<h3>List Books Available</h3>
+<table id="book_list">
+    <tr>
+        <td>Name</td>
+        <td>Author</td>
+        <td>Description</td>
+        <td>Category</td>
+        <td>Action</td>
+    </tr>
+    <th:block th:each="b: ${books}">
+        <tr>
+            <td th:text="${b.name}"></td>
+            <td th:text="${b.author}"></td>
+            <td th:text="${b.description}"></td>
+            <td th:text="${b.category.name}"></td>
+            <td><a class="deleteBook" th:href="${b.id}">Delete</a></td>
+        </tr>
+    </th:block>
+</table>
+</body>
+<script>
+    $(document).ready(
+      $(`.deleteBook`) .click(function (){
+          let a = $(this);
+          let book_id = a.getAttribute("href");
+          deleteBookById(book_id);
+      })
+    );
+    function createBook(){
+        let name = $('#name').val();
+        let author = $('#author').val();
+        let description = $('#description').val();
+        let category_id = parseInt($('#category').val());
+
+        let book = {
+          name:name,
+            author:author,
+            description:description,
+            category:{
+              id:category_id
+            }
+        };
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "POST",
+            data: JSON.stringify(book),
+            //tên API
+            url: "/book",
+            //xử lý khi thành công
+            success: successHandler
+        });
+        event.preventDefault();
+    }
+    function successHandler(){
+        $.ajax({
+            type: "GET",
+            //tên API
+            url: "/book",
+            //xử lý khi thành công
+            success: function (data){
+                reloadListBook(data)
+        }
+            //     function (data) {
+            //     // hien thi danh sach o day
+            //     let content = '    <tr>\n' +
+            //         '        <td>Name</td>\n' +
+            //         '        <td>Author</td>\n' +
+            //         '        <td>Description</td>\n' +
+            //         '        <td>Category</td>\n' +
+            //         '    </tr>';
+            //     for (let i = 0; i < data.length; i++) {
+            //         content += getBook(data[i]);
+            //     }
+            //     document.getElementById('book_list').innerHTML = content;
+            // }
+        });
+    }
+    function getBook(book){
+        return `<tr>
+<td>${book.name}</td>
+<td >${book.author}</td>
+<td >${book.description}</td>
+<td >${book.category.name}</td>
+<td><a href="${book.id}" onclick="deleteBookById(this)">Delete</a></td>
+</tr>`;
+    }
+    function deleteBookById(a){
+        let id = a.getAttribute("href");
+        $.ajax({
+            type: "DELETE",
+            //tên API
+            url: "/book/"+id,
+            //xử lý khi thành công
+            success:successHandler
+        });
+        event.preventDefault();
+    }
+    function reloadListBook(data){
+        // hien thi danh sach o day
+        let content = '    <tr>\n' +
+            '        <td>Name</td>\n' +
+            '        <td>Author</td>\n' +
+            '        <td>Description</td>\n' +
+            '        <td>Category</td>\n' +
+            '    </tr>';
+        for (let i = 0; i < data.length; i++) {
+            content += getBook(data[i]);
+        }
+        document.getElementById('book_list').innerHTML = content;
+    }
+</script>
+</html>
