@@ -24,7 +24,7 @@
         </th:block>
     </select></td></tr>
     </table>
-    <input type="submit" value="Create" onclick="createBook(this)">
+    <input type="submit" value="Create" onclick="createBook()">
 </form>
 <h3>List Books Available</h3>
 <table id="book_list">
@@ -41,19 +41,18 @@
             <td th:text="${b.author}"></td>
             <td th:text="${b.description}"></td>
             <td th:text="${b.category.name}"></td>
-            <td><a class="deleteBook" th:href="${b.id}">Delete</a></td>
+            <td><a class="deleteBook" onclick="deleteBookById(this)" th:href="${b.id}">Delete</a></td>
         </tr>
     </th:block>
 </table>
 </body>
 <script>
-    $(document).ready(
-      $(`.deleteBook`) .click(function (){
-          let a = $(this);
-          let book_id = a.getAttribute("href");
-          deleteBookById(book_id);
-      })
-    );
+    // $(document).ready(
+    //   $(`.deleteBook`) .click(function (){
+    //       let a = $(this);
+    //       deleteBookById(a);
+    //   })
+    // );
     function createBook(){
         let name = $('#name').val();
         let author = $('#author').val();
@@ -133,7 +132,8 @@
             '        <td>Name</td>\n' +
             '        <td>Author</td>\n' +
             '        <td>Description</td>\n' +
-            '        <td>Category</td>\n' +
+            '        <td>Category</td>' +
+            '<td>Action</td>\n' +
             '    </tr>';
         for (let i = 0; i < data.length; i++) {
             content += getBook(data[i]);
