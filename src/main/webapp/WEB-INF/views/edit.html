@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Welcum tu BookSto</h1>
+<form>
+    <h3>Update Book Information</h3>
+    <table th:object="${book}">
+        <tr><td>Name</td>
+            <td><input type="text" th:field="*{name}"/></td></tr>
+        <tr><td>Author</td>
+            <td><input type="text" th:field="*{author}"/></td></tr>
+        <tr><td>Description</td>
+            <td><input type="text" th:field="*{description}"/></td></tr>
+        <tr><td>Category</td>
+            <td><select name="category" id="category">
+                <th:block>
+                    <option th:each="cate: ${categories}" th:text="${cate.name}" th:value="${cate.id}">
+                    </option>
+                </th:block>
+            </select></td></tr>
+        <tr><td><input type="button" value="Update" th:href="*{id}" onclick="editBook(this)" /></td></tr>
+    </table>
+
+</form>
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>
+    function editBook(a){
+        let id = a.getAttribute("href");
+        let name = $('#name').val();
+        let author = $('#author').val();
+        let description = $('#description').val();
+        let category_id = parseInt($('#category').val());
+
+        let book = {
+            name:name,
+            author:author,
+            description:description,
+            category:{
+                id:category_id
+            }
+        };
+
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            type: "PUT",
+            data: JSON.stringify(book),
+            //tên API
+            url: "/book/"+id,
+            //xử lý khi thành công
+            success: function (){
+                window.alert("Book updated!");
+                window.location="/book/home";
+            }
+        });
+        event.preventDefault();
+    }
+</script>
+</html>

@@ -7,9 +7,11 @@ import com.service.book_service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,11 +27,7 @@ public class BookController {
         return categoryService.findAll();
     }
 
-//    @GetMapping("/list")
-//    public ModelAndView getListBook(){
-//        Iterable<Book> list = bookService.findAll();
-//        return new ModelAndView("home","books",list);
-//    }
+
     @GetMapping("/home")
     public ModelAndView getListBook(){
         Iterable<Book> list = bookService.findAll();
@@ -39,13 +37,21 @@ public class BookController {
     public ResponseEntity<Iterable<Book>> findAll(){
         return new ResponseEntity<>(bookService.findAll(), HttpStatus.OK);
     }
+//    @GetMapping("/{id}")
+//    private ResponseEntity<Book> findById(@PathVariable Long id){
+//        Optional<Book> book = bookService.findById(id);
+//        if(!book.isPresent()){
+//            return new ResponseEntity<>(book.get(),HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//    }
     @GetMapping("/{id}")
-    private ResponseEntity<Book> findById(@PathVariable Long id){
+    private ModelAndView findById(@PathVariable Long id){
         Optional<Book> book = bookService.findById(id);
-        if(!book.isPresent()){
-            return new ResponseEntity<>(book.get(),HttpStatus.OK);
+        if(book.isPresent()){
+            return new ModelAndView("/edit","book",book.get());
         }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return getListBook();
     }
     @PostMapping
     private ResponseEntity<Book> createBook(@RequestBody Book book){

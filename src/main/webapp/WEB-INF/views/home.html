@@ -28,31 +28,10 @@
 </form>
 <h3>List Books Available</h3>
 <table id="book_list">
-    <tr>
-        <td>Name</td>
-        <td>Author</td>
-        <td>Description</td>
-        <td>Category</td>
-        <td>Action</td>
-    </tr>
-    <th:block th:each="b: ${books}">
-        <tr>
-            <td th:text="${b.name}"></td>
-            <td th:text="${b.author}"></td>
-            <td th:text="${b.description}"></td>
-            <td th:text="${b.category.name}"></td>
-            <td><a class="deleteBook" onclick="deleteBookById(this)" th:href="${b.id}">Delete</a></td>
-        </tr>
-    </th:block>
 </table>
 </body>
 <script>
-    // $(document).ready(
-    //   $(`.deleteBook`) .click(function (){
-    //       let a = $(this);
-    //       deleteBookById(a);
-    //   })
-    // );
+    $(document).ready(successHandler);
     function createBook(){
         let name = $('#name').val();
         let author = $('#author').val();
@@ -78,7 +57,10 @@
             //tên API
             url: "/book",
             //xử lý khi thành công
-            success: successHandler
+            success: function (){
+                window.alert("New Book created!");
+                successHandler();
+            }
         });
         event.preventDefault();
     }
@@ -91,19 +73,6 @@
             success: function (data){
                 reloadListBook(data)
         }
-            //     function (data) {
-            //     // hien thi danh sach o day
-            //     let content = '    <tr>\n' +
-            //         '        <td>Name</td>\n' +
-            //         '        <td>Author</td>\n' +
-            //         '        <td>Description</td>\n' +
-            //         '        <td>Category</td>\n' +
-            //         '    </tr>';
-            //     for (let i = 0; i < data.length; i++) {
-            //         content += getBook(data[i]);
-            //     }
-            //     document.getElementById('book_list').innerHTML = content;
-            // }
         });
     }
     function getBook(book){
@@ -112,10 +81,14 @@
 <td >${book.author}</td>
 <td >${book.description}</td>
 <td >${book.category.name}</td>
-<td><a href="${book.id}" onclick="deleteBookById(this)">Delete</a></td>
+<td><a href="${book.id}" onclick="deleteBookById(this)">Delete</a></br>
+<a href="${book.id}" name="edit">edit</a></td>
 </tr>`;
     }
     function deleteBookById(a){
+        event.preventDefault();
+        let check = window.confirm("Delete this book?");
+        if(check){
         let id = a.getAttribute("href");
         $.ajax({
             type: "DELETE",
@@ -125,7 +98,7 @@
             success:successHandler
         });
         event.preventDefault();
-    }
+    }}
     function reloadListBook(data){
         // hien thi danh sach o day
         let content = '    <tr>\n' +
